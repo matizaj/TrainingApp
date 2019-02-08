@@ -13,6 +13,9 @@ exerciseChanged = new Subject<Exercise>();
     {id: 'cli', name: 'lead climbing', duration: 300, calories: 950}
   ];
   private runningExercise: Exercise;
+
+  private exercises: Exercise[] = [];
+
   getAvailableExercice() {
     return this.availableExercise.slice();
   }
@@ -21,5 +24,29 @@ exerciseChanged = new Subject<Exercise>();
     const selectesExercise = this.availableExercise.find(exercise => exercise.id === exerciseId);
     this.runningExercise = selectesExercise;
     this.exerciseChanged.next({...this.runningExercise});
+  }
+
+  getRunningExercise() {
+    return {...this.runningExercise};
+  }
+
+  completeExercise() {
+    this.exercises.push({...this.runningExercise, date: new Date(), state: 'completed'});
+    this.runningExercise = null;
+    this.exerciseChanged.next(null);
+  }
+
+  cancelExercise(progress: number) {
+    this.exercises.push({...this.runningExercise,
+      duration: this.runningExercise.duration * (progress / 100),
+      calories: this.runningExercise.calories * (progress / 100),
+      date: new Date(),
+      state: 'cancelled'});
+    this.runningExercise = null;
+    this.exerciseChanged.next(null);
+  }
+
+  getCompletedOrCanceledExercise() {
+    return this.exercises.slice();
   }
 }
